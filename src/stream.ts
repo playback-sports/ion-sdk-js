@@ -15,13 +15,13 @@ export const VideoConstraints: VideoConstraints = {
       width: { ideal: 320 },
       height: { ideal: 180 },
       frameRate: {
-        ideal: 15,
+        ideal: 30,
         max: 30,
       },
     },
     encodings: {
       maxBitrate: 150_000,
-      maxFramerate: 15.0,
+      maxFramerate: 30.0,
     },
   },
   vga: {
@@ -30,7 +30,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 360 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -44,7 +44,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 540 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -58,7 +58,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 720 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -72,7 +72,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 1080 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -86,7 +86,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 1440 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -252,7 +252,9 @@ export class LocalStream extends MediaStream {
       const cap = RTCRtpSender.getCapabilities(kind);
       if (!cap) return;
       const selCodec = cap.codecs.find(
-        (c) => c.mimeType.toLowerCase() === `video/${this.constraints.codec.toLowerCase()}` || c.mimeType.toLowerCase() === `audio/opus`
+        (c) =>
+          c.mimeType.toLowerCase() === `video/${this.constraints.codec.toLowerCase()}` ||
+          c.mimeType.toLowerCase() === `audio/opus`,
       );
       if (selCodec) {
         transceiver.setCodecPreferences([selCodec]);
