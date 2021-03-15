@@ -118,6 +118,9 @@ const defaults = {
   simulcast: false,
 };
 
+interface LogFunctions {
+  dev(...params: any[]): void;
+}
 export class LocalStream extends MediaStream {
   static async getUserMedia(constraints: Constraints = defaults) {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -132,8 +135,8 @@ export class LocalStream extends MediaStream {
     });
     return new LocalStream(stream, {
       ...defaults,
-      ...constraints,
-    });
+      ...constraints
+    }, null);
   }
 
   static async getDisplayMedia(
@@ -152,16 +155,18 @@ export class LocalStream extends MediaStream {
 
     return new LocalStream(stream, {
       ...defaults,
-      ...constraints,
-    });
+      ...constraints
+    }, null);
   }
 
   constraints: Constraints;
   pc?: RTCPeerConnection;
+  logger: LogFunctions|null;
 
-  constructor(stream: MediaStream, constraints: Constraints) {
+  constructor(stream: MediaStream, constraints: Constraints, logger: LogFunctions|null) {
     super(stream);
     this.constraints = constraints;
+    this.logger = logger;
   }
 
   private static computeAudioConstraints(constraints: Constraints): MediaTrackConstraints {
@@ -201,6 +206,9 @@ export class LocalStream extends MediaStream {
   }
 
   private publishTrack(track: MediaStreamTrack) {
+    if (this.logger) {
+      this.logger.dev('publishing track ion');
+    }
     if (this.pc) {
       if (track.kind === 'video' && this.constraints.simulcast) {
         const idx = resolutions.indexOf(this.constraints.resolution);
@@ -240,7 +248,7 @@ export class LocalStream extends MediaStream {
         const transceiver = this.pc.addTransceiver(track, {
           streams: [this],
           direction: 'sendonly',
-          sendEncodings: track.kind === 'video' ? [VideoConstraints[this.constraints.resolution].encodings] : undefined,
+          // sendEncodings: track.kind === 'video' ? [VideoConstraints[this.constraints.resolution].encodings] : undefined,
         });
         this.setPreferredCodec(transceiver, track.kind);
       }
@@ -335,11 +343,25 @@ export class LocalStream extends MediaStream {
   }
 
   updateMediaEncodingParams(encodingParams: RTCRtpEncodingParameters) {
-    if (!this.pc) return;
+    if (this.logger) {
+      this.logger.dev('updateMediaEncodingParams tracks', this.getTracks().length);
+    }
+
+    if (!this.pc) {
+      if (this.logger) {
+        this.logger.dev('no pc in updateMediaEncodingParams');
+      }
+
+      return;
+    }
+
     this.getTracks().forEach((track) => {
       const senders = this.pc?.getSenders()?.filter((sender) => track.id === sender.track?.id);
       senders?.forEach((sender) => {
         const params = sender.getParameters();
+        if (this.logger) {
+          this.logger.dev('sender params', JSON.stringify(params));
+        }
         if (!params.encodings) {
           params.encodings = [{}];
         }
@@ -347,6 +369,9 @@ export class LocalStream extends MediaStream {
           ...params.encodings[0],
           ...encodingParams,
         };
+        if (this.logger) {
+          this.logger.dev('setting new params', JSON.stringify(params));
+        }
         sender.setParameters(params);
       });
     });
