@@ -1,5 +1,5 @@
 {
-  "name": "ion-sdk-js",
+  "name": "@playback-sports/ion-sdk-js",
   "version": "1.7.0",
   "description": "A js sdk for ion sfu",
   "main": "lib/index.js",
