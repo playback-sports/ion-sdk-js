@@ -133,10 +133,14 @@ export class LocalStream extends MediaStream {
         ...constraints,
       }),
     });
-    return new LocalStream(stream, {
-      ...defaults,
-      ...constraints
-    }, null);
+    return new LocalStream(
+      stream,
+      {
+        ...defaults,
+        ...constraints,
+      },
+      null,
+    );
   }
 
   static async getDisplayMedia(
@@ -153,17 +157,21 @@ export class LocalStream extends MediaStream {
       video: true,
     });
 
-    return new LocalStream(stream, {
-      ...defaults,
-      ...constraints
-    }, null);
+    return new LocalStream(
+      stream,
+      {
+        ...defaults,
+        ...constraints,
+      },
+      null,
+    );
   }
 
   constraints: Constraints;
   pc?: RTCPeerConnection;
-  logger: LogFunctions|null;
+  logger: LogFunctions | null;
 
-  constructor(stream: MediaStream, constraints: Constraints, logger: LogFunctions|null) {
+  constructor(stream: MediaStream, constraints: Constraints, logger: LogFunctions | null) {
     super(stream);
     this.constraints = constraints;
     this.logger = logger;
@@ -257,15 +265,21 @@ export class LocalStream extends MediaStream {
 
   private setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
     if ('setCodecPreferences' in transceiver) {
-      const cap = RTCRtpSender.getCapabilities(kind);
-      if (!cap) return;
-      const selCodec = cap.codecs.find(
-        (c) =>
-          c.mimeType.toLowerCase() === `video/${this.constraints.codec.toLowerCase()}` ||
-          c.mimeType.toLowerCase() === `audio/opus`,
-      );
-      if (selCodec) {
-        transceiver.setCodecPreferences([selCodec]);
+      if (kind === 'video') {
+        transceiver.setCodecPreferences([
+          {
+            clockRate: 90000,
+            mimeType: 'video/H264',
+            sdpFmtpLine: 'level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f',
+          },
+        ]);
+      } else {
+        const cap = RTCRtpSender.getCapabilities(kind);
+        if (!cap) return;
+        const selCodec = cap.codecs.find((c) => c.mimeType.toLowerCase() === `audio/opus`);
+        if (selCodec) {
+          transceiver.setCodecPreferences([selCodec]);
+        }
       }
     }
   }
