@@ -119,7 +119,12 @@ const defaults = {
 };
 
 interface LogFunctions {
-  dev(...params: any[]): void;
+  error(...params: any[]): void;
+  warn(...params: any[]): void;
+  info(...params: any[]): void;
+  verbose(...params: any[]): void;
+  debug(...params: any[]): void;
+  silly(...params: any[]): void;
 }
 export class LocalStream extends MediaStream {
   static async getUserMedia(constraints: Constraints = defaults) {
@@ -215,7 +220,7 @@ export class LocalStream extends MediaStream {
 
   private publishTrack(track: MediaStreamTrack) {
     if (this.logger) {
-      this.logger.dev('publishing track ion');
+      this.logger.debug('publishing track ion');
     }
     if (this.pc) {
       if (track.kind === 'video' && this.constraints.simulcast) {
@@ -358,12 +363,12 @@ export class LocalStream extends MediaStream {
 
   updateMediaEncodingParams(encodingParams: RTCRtpEncodingParameters) {
     if (this.logger) {
-      this.logger.dev('updateMediaEncodingParams tracks', this.getTracks().length);
+      this.logger.debug('updateMediaEncodingParams tracks', this.getTracks().length);
     }
 
     if (!this.pc) {
       if (this.logger) {
-        this.logger.dev('no pc in updateMediaEncodingParams');
+        this.logger.debug('no pc in updateMediaEncodingParams');
       }
 
       return;
@@ -374,7 +379,7 @@ export class LocalStream extends MediaStream {
       senders?.forEach((sender) => {
         const params = sender.getParameters();
         if (this.logger) {
-          this.logger.dev('sender params', JSON.stringify(params));
+          this.logger.debug('sender params', JSON.stringify(params));
         }
         if (!params.encodings) {
           params.encodings = [{}];
@@ -384,7 +389,7 @@ export class LocalStream extends MediaStream {
           ...encodingParams,
         };
         if (this.logger) {
-          this.logger.dev('setting new params', JSON.stringify(params));
+          this.logger.debug('setting new params', JSON.stringify(params));
         }
         sender.setParameters(params);
       });
