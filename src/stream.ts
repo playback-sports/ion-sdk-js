@@ -30,7 +30,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 360 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -44,7 +44,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 540 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -58,7 +58,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 720 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -72,7 +72,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 1080 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
@@ -86,7 +86,7 @@ export const VideoConstraints: VideoConstraints = {
       height: { ideal: 1440 },
       frameRate: {
         ideal: 30,
-        max: 60,
+        max: 30,
       },
     },
     encodings: {
